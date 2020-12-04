@@ -11,53 +11,70 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 gup_toggle := 0  ; Off
 gup_every := 0.1*60*1000
 
-heal_toggle := 0  ; Off
-heal_every := 0.6*60*1000
+flash_heal_toggle := 0  ; Off
+flash_heal_every := 0.6*60*1000
 
-staff_charge_duration:=205  ;edit to maximize dps
-fire_every:=50
-alt_fire_every:=3000  ;long to allow for upgrading/healling/repair
+; Edit staff_charge_duration to maximize DPS
+; The longer you can charge without raising the staff the better your DPS from
+;   that staff will be. Dial this up or down until your staff doesn't raise
+;   when autofiring and you'll be pretty close to max DPS for your staff. This
+;   value will probably be different for different staffs.
+staff_charge_duration := 205
 
+; The number of miliseconds to try to hold the alt fire button.
+;   This is long to allow for upgrading/healling/repair inbetween redoing the
+;   alt fire. If you can't manage to upgrade a tower to 3 stars while auto alt
+;   fire is on, then increasing this should help. This will cause some aborted
+;   upgrades just because of bad timing but it shouldn't be a PITA to upgrade a
+;   tower.
+alt_fire_every := 3000  
 
-SetTimer, GUp,  %gup_every%
-SetTimer, Heal, %heal_every%
+; The interval inbetween shots.
+fire_every := 50
 
 Return
 
+
+; Pause the hotkeys
+^Esc:: Suspend
+
+
+; Auto flash healling and auto G have a linked off toggle so they both turn off
+;   when one of them is turned off.
 
 ; Auto-forced-G-up (^G)
 !g::
-    gup_toggle := !gup_toggle
-    if gup_toggle {
-        SoundPlay *-1
-        Send ^g
-    } else {
-        heal_toggle := 0
-        SoundPlay *16
-    }
+    SoundPlay *-1
+    Send ^g
+    SetTimer, GUp, %gup_every%
+Return
+
+!+g::
+    SetTimer, GUp, Off
+    SetTimer, FlashHeal, Off
+    SoundPlay *16
 Return
 
 GUp:
-    if gup_toggle
-            Send ^g
+    Send ^g
 Return
 
 
 ; Auto-flash-heal
 !0::
-    heal_toggle := !heal_toggle
-    if heal_toggle {
-        SoundPlay *-1
-        Send 0
-    } else {
-        gup_toggle := 0
-        SoundPlay *16
-    }
+    SoundPlay *-1
+    Send 0
+    SetTimer, FlashHeal, %flash_heal_every%
 Return
 
-Heal:
-    if heal_toggle
-        Send 0
+!+0::
+    SetTimer, FlashHeal, Off
+    SetTimer, GUp, Off
+    SoundPlay *16
+Return
+
+FlashHeal:
+    Send 0
 Return
 
 
@@ -119,7 +136,7 @@ return
 return
 
 ^9::
-    SendInput {9} 
+    SendInput {9}
     SendInput {Space}
 return
 
