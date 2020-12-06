@@ -61,13 +61,13 @@ Return
 
 
 ; Auto-flash-heal
-!0::
+!h::
     SoundPlay *-1
     Send 0
     SetTimer, FlashHeal, %flash_heal_every%
 Return
 
-!+0::
+!+h::
     SetTimer, FlashHeal, Off
     SetTimer, GUp, Off
     SoundPlay *16
