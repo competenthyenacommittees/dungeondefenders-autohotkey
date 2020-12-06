@@ -37,37 +37,41 @@ Return
 ; Using Alt to start because Ctl+LButton is used to upgrade stats in chunks.
 ;   Activating this macro when trying to bulk upgrade will result in dumping 
 ;   all remaining upgrades into a stat (at least until it hits cap).
-!LButton::
+~LButton & WheelUp::
     SetTimer, StaffFireOnce, %fire_every%
     SoundPlay *-1
 Return
 
-^LButton::
+~LButton & WheelDown::
     SetTimer, StaffFireOnce, Off
     SoundPlay *16
 Return
 
 StaffFireOnce:
-    Send {LButton Down} 
-    Sleep staff_charge_duration
-    Send {LButton Up}
+	if WinActive("Dungeon Defenders") {
+        Send {LButton Down} 
+        Sleep staff_charge_duration
+        Send {LButton Up}
+    }
 Return
 
 
 ; Autofire monk weapons
 ; Using R to prevent cancelling actions while holding down the alt fire button
-!RButton::
+~RButton & WheelUp::
     SetTimer, AltFire, %alt_fire_every%
     SoundPlay *-1
 Return
 
-^RButton::
+~RButton & WheelDown::
     SetTimer, AltFire, Off
     Send {R Up}
     SoundPlay *16
 Return
 
 AltFire:
-    Send {R Up}
-    Send {R Down}
+	if WinActive("Dungeon Defenders") {
+        Send {R Up}  ; Release R so it can be held again.
+        Send {R Down}
+    }
 Return
